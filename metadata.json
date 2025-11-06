@@ -1,0 +1,5 @@
+{
+  "name": "B.Tech Study Buddy",
+  "description": "An AI-powered study assistant for B.Tech students. Upload your syllabus, notes, or past question papers to get concise summaries, detailed notes, relevant video recommendations, and a list of important questions to ace your exams.",
+  "requestFramePermissions": []
+}
