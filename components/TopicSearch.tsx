@@ -1,3 +1,4 @@
+
 import React, { useState } from 'react';
 import { MagnifyingGlassIcon } from '@heroicons/react/24/solid';
 
@@ -16,16 +17,16 @@ const TopicSearch: React.FC<TopicSearchProps> = ({ onTopicSearched }) => {
   };
 
   return (
-    <div className="bg-gray-800/50 backdrop-blur-sm p-8 rounded-2xl border border-gray-700 shadow-2xl shadow-cyan-500/10">
-      <h2 className="text-2xl font-semibold text-center mb-2 text-cyan-300">Explore a Topic</h2>
-      <p className="text-center text-gray-400 mb-6">Enter an engineering topic, subject, or concept you want to learn about.</p>
+    <div className="bg-gray-100/50 dark:bg-gray-800/50 backdrop-blur-sm p-8 rounded-2xl border border-gray-200 dark:border-gray-700 shadow-2xl shadow-cyan-500/10">
+      <h2 className="text-2xl font-semibold text-center mb-2 text-cyan-700 dark:text-cyan-300">Explore a Topic</h2>
+      <p className="text-center text-gray-600 dark:text-gray-400 mb-6">Enter an engineering topic, subject, or concept you want to learn about.</p>
       <form onSubmit={handleSubmit} className="flex flex-col sm:flex-row gap-4">
         <input
           type="text"
           value={topic}
           onChange={(e) => setTopic(e.target.value)}
           placeholder="e.g., 'Thermodynamics basics', 'Data Structures in C++'"
-          className="w-full px-4 py-3 bg-gray-700/50 border border-gray-600 rounded-lg text-gray-200 focus:ring-2 focus:ring-cyan-400 focus:border-cyan-400 transition-colors"
+          className="w-full px-4 py-3 bg-white/50 dark:bg-gray-700/50 border border-gray-300 dark:border-gray-600 rounded-lg text-gray-800 dark:text-gray-200 focus:ring-2 focus:ring-cyan-400 focus:border-cyan-400 transition-colors"
           required
         />
         <button
