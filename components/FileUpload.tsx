@@ -31,7 +31,7 @@ const FileUpload: React.FC<FileUploadProps> = ({ onFileProcessed }) => {
     try {
       const pdfjs = await pdfjsLib;
       if (!pdfjs.GlobalWorkerOptions.workerSrc) {
-        pdfjs.GlobalWorkerOptions.workerSrc = `https://cdnjs.cloudflare.com/ajax/libs/pdf.js/${pdfjs.version}/pdf.worker.min.mjs`;
+        pdfjs.GlobalWorkerOptions.workerSrc = `https://cdnjs.cloudflare.com/ajax/libs/pdf.js/${pdfjs.version}/pdf.worker.min.js`;
       }
       
       const fileReader = new FileReader();

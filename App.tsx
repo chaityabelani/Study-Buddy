@@ -104,7 +104,7 @@ const App: React.FC = () => {
         setResult(apiResult);
       } catch (err) {
         console.error(err);
-        setError(`Failed to generate ${action}. Please try again.`);
+        setError(err instanceof Error ? err.message : `Failed to generate ${action}. Please try again.`);
       } finally {
         setIsLoading(false);
       }
@@ -125,7 +125,7 @@ const App: React.FC = () => {
       setResult(apiResult);
     } catch (err) {
       console.error(err);
-      setError(`Failed to generate ${ActionType.VIDEOS}. Please try again.`);
+      setError(err instanceof Error ? err.message : `Failed to generate ${ActionType.VIDEOS}. Please try again.`);
     } finally {
       setIsLoading(false);
     }

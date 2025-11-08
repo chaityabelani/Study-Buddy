@@ -1,7 +1,25 @@
+
 import { GoogleGenAI, Type } from "@google/genai";
 import { VideoSuggestion, QuizQuestion } from '../types';
 
-const ai = new GoogleGenAI({ apiKey: process.env.API_KEY });
+const getAi = () => {
+  const apiKey = process.env.API_KEY;
+  if (!apiKey) {
+    throw new Error("API_KEY is not set in the environment. Please configure it in your deployment settings.");
+  }
+  return new GoogleGenAI({ apiKey });
+};
+
+// Helper function to reliably extract JSON from the AI's response,
+// which might be wrapped in markdown code blocks.
+const extractJson = (text: string): string => {
+  const match = text.match(/```(json)?\s*([\s\S]*?)\s*```/);
+  if (match && match[2]) {
+    return match[2].trim();
+  }
+  return text.trim();
+};
+
 
 const textGenerationModel = 'gemini-2.5-flash';
 
@@ -22,6 +40,7 @@ As an expert AI assistant for B.Tech students, adhere to the following rules for
 
 
 export const generateSummary = async (text: string): Promise<string> => {
+  const ai = getAi();
   const prompt = `As a senior engineer, create a professional presentation summary of the following content for my boss. The output must be structured into distinct slides.
 ${AI_INSTRUCTIONS}
 The content is: \n\n${text}`;
@@ -35,6 +54,7 @@ The content is: \n\n${text}`;
 };
 
 export const generateNotes = async (text: string): Promise<string> => {
+  const ai = getAi();
   const prompt = `Generate detailed, well-structured notes from the following content, suitable for a B.Tech student's exam preparation.
 ${AI_INSTRUCTIONS}
 The content is: \n\n${text}`;
@@ -48,6 +68,7 @@ The content is: \n\n${text}`;
 };
 
 export const findImportantQuestions = async (text: string): Promise<string> => {
+  const ai = getAi();
   const prompt = `Based on the provided content, identify and list the 10 most common and important questions for a B.Tech student. This is for exam preparation. If any answers require formulas, provide them.
 ${AI_INSTRUCTIONS}
 The content is: \n\n${text}`;
@@ -65,6 +86,7 @@ export const findVideos = async (
   channels: string, 
   length: string
 ): Promise<VideoSuggestion[]> => {
+  const ai = getAi();
   let prompt = `Analyze the following academic content. Identify the 5 most critical topics for a B.Tech student. For each topic, suggest a relevant YouTube video title and a short, helpful description of what the video should cover. The content is: \n\n${text}`;
 
   if (channels.trim()) {
@@ -119,7 +141,7 @@ export const findVideos = async (
   });
   
   try {
-    const jsonStr = response.text.trim();
+    const jsonStr = extractJson(response.text);
     const videoSuggestions: VideoSuggestion[] = JSON.parse(jsonStr);
     return videoSuggestions;
   } catch (error) {
@@ -129,6 +151,7 @@ export const findVideos = async (
 };
 
 export const generateQuiz = async (text: string): Promise<QuizQuestion[]> => {
+  const ai = getAi();
   const prompt = `Based on the provided content, create a multiple-choice quiz with 5 questions to test a B.Tech student's understanding. For each question, provide 4 options, clearly indicate the correct answer, and provide a brief reason why that answer is correct.
 ${AI_INSTRUCTIONS}
 The content is: \n\n${text}`;
@@ -168,20 +191,40 @@ The content is: \n\n${text}`;
   });
 
   try {
-    const jsonStr = response.text.trim();
+    const jsonStr = extractJson(response.text);
     const quiz: QuizQuestion[] = JSON.parse(jsonStr);
-    // Basic validation
-    if (!Array.isArray(quiz) || !quiz[0]?.question || !quiz[0]?.reason) {
-        throw new Error("Invalid quiz format received from AI.");
+    
+    // More robust validation
+    if (!Array.isArray(quiz)) {
+        console.error("Invalid quiz format: response is not an array.", quiz);
+        throw new Error("The AI did not return a valid quiz array.");
     }
+    // It's ok if the quiz is empty, but if it's not, check the first question's structure.
+    if (quiz.length > 0) {
+        const firstQuestion = quiz[0];
+        if (
+            typeof firstQuestion.question !== 'string' ||
+            !Array.isArray(firstQuestion.options) ||
+            typeof firstQuestion.answer !== 'string' ||
+            typeof firstQuestion.reason !== 'string'
+        ) {
+            console.error("Invalid quiz format: question structure is incorrect.", firstQuestion);
+            throw new Error("The AI returned a quiz with an invalid question format.");
+        }
+    }
+    
     return quiz;
   } catch (error) {
     console.error("Failed to parse Gemini response as JSON for quiz:", error);
+    if (error instanceof Error && error.message.includes("invalid question format")) {
+        throw error;
+    }
     throw new Error("The AI response for the quiz was not in the expected format. Please try again.");
   }
 };
 
 export const simplifyExplanation = async (formula: string, explanation: string): Promise<string> => {
+  const ai = getAi();
   const prompt = `Taking the following mathematical formula and its technical explanation, rewrite the explanation in extremely simple terms, as if explaining it to a complete beginner or a 5-year-old. Focus on the core concept and intuition, not the jargon.
 
 **Original Formula:**
