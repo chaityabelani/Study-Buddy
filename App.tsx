@@ -1,4 +1,3 @@
-
 import React, { useState, useCallback, useEffect } from 'react';
 import { ActionType, VideoSuggestion, QuizQuestion } from './types';
 import * as geminiService from './services/geminiService';
@@ -33,8 +32,10 @@ const App: React.FC = () => {
   const [videoLength, setVideoLength] = useState<string>('any');
 
   useEffect(() => {
+    // FIX: Use process.env.API_KEY as per the coding guidelines.
     if (!process.env.API_KEY) {
       setIsApiConfigured(false);
+      // FIX: Update error message to reference API_KEY.
       console.error("CRITICAL: API_KEY environment variable is not set. The application will not function.");
     }
 
@@ -166,7 +167,8 @@ const App: React.FC = () => {
                 The Google Gemini API key is missing. The application cannot function without it.
               </p>
               <p className="text-sm text-red-600 dark:text-red-400 mt-2">
-                <strong>For Developers:</strong> Please ensure the <code>API_KEY</code> environment variable is set in your deployment environment (e.g., Vercel).
+                {/* FIX: Update environment variable name to API_KEY. */}
+                <strong>For Developers:</strong> Please ensure the <code>API_KEY</code> environment variable is set in your <code>.env</code> file for local development or in your deployment environment (e.g., Vercel).
               </p>
             </div>
           </div>

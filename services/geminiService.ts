@@ -1,14 +1,9 @@
-
 import { GoogleGenAI, Type } from "@google/genai";
 import { VideoSuggestion, QuizQuestion } from '../types';
 
-const getAi = () => {
-  const apiKey = process.env.API_KEY;
-  if (!apiKey) {
-    throw new Error("API_KEY is not set. For developers: please configure the API_KEY environment variable in your deployment settings to enable the application.");
-  }
-  return new GoogleGenAI({ apiKey });
-};
+// FIX: Per coding guidelines, initialize GoogleGenAI once with process.env.API_KEY.
+// The key's availability is a hard requirement and assumed to be handled externally.
+const ai = new GoogleGenAI({ apiKey: process.env.API_KEY });
 
 // Helper function to reliably extract JSON from the AI's response,
 // which might be wrapped in markdown code blocks.
@@ -40,7 +35,6 @@ As an expert AI assistant for B.Tech students, adhere to the following rules for
 
 
 export const generateSummary = async (text: string): Promise<string> => {
-  const ai = getAi();
   const prompt = `As a senior engineer, create a professional presentation summary of the following content for my boss. The output must be structured into distinct slides.
 ${AI_INSTRUCTIONS}
 The content is: \n\n${text}`;
@@ -54,7 +48,6 @@ The content is: \n\n${text}`;
 };
 
 export const generateNotes = async (text: string): Promise<string> => {
-  const ai = getAi();
   const prompt = `Generate detailed, well-structured notes from the following content, suitable for a B.Tech student's exam preparation.
 ${AI_INSTRUCTIONS}
 The content is: \n\n${text}`;
@@ -68,7 +61,6 @@ The content is: \n\n${text}`;
 };
 
 export const findImportantQuestions = async (text: string): Promise<string> => {
-  const ai = getAi();
   const prompt = `Based on the provided content, identify and list the 10 most common and important questions for a B.Tech student. This is for exam preparation. If any answers require formulas, provide them.
 ${AI_INSTRUCTIONS}
 The content is: \n\n${text}`;
@@ -86,7 +78,6 @@ export const findVideos = async (
   channels: string, 
   length: string
 ): Promise<VideoSuggestion[]> => {
-  const ai = getAi();
   let prompt = `Analyze the following academic content. Identify the 5 most critical topics for a B.Tech student. For each topic, suggest a relevant YouTube video title and a short, helpful description of what the video should cover. The content is: \n\n${text}`;
 
   if (channels.trim()) {
@@ -151,7 +142,6 @@ export const findVideos = async (
 };
 
 export const generateQuiz = async (text: string): Promise<QuizQuestion[]> => {
-  const ai = getAi();
   const prompt = `Based on the provided content, create a multiple-choice quiz with 5 questions to test a B.Tech student's understanding. For each question, provide 4 options, clearly indicate the correct answer, and provide a brief reason why that answer is correct.
 ${AI_INSTRUCTIONS}
 The content is: \n\n${text}`;
@@ -224,7 +214,6 @@ The content is: \n\n${text}`;
 };
 
 export const simplifyExplanation = async (formula: string, explanation: string): Promise<string> => {
-  const ai = getAi();
   const prompt = `Taking the following mathematical formula and its technical explanation, rewrite the explanation in extremely simple terms, as if explaining it to a complete beginner or a 5-year-old. Focus on the core concept and intuition, not the jargon.
 
 **Original Formula:**
