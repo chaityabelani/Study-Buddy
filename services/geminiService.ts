@@ -1,8 +1,22 @@
 import { GoogleGenAI, Type } from "@google/genai";
 import { VideoSuggestion, QuizQuestion } from '../types';
 
-// Lazily initialize the AI instance to avoid crashing on startup if the API key isn't ready.
-const getAi = () => new GoogleGenAI({ apiKey: process.env.API_KEY });
+let ai: GoogleGenAI | undefined;
+
+// Use a function to get a singleton instance of the AI client.
+// This ensures the client is created only when first needed and
+// only if an API key is available.
+function getAi(): GoogleGenAI {
+  if (!process.env.API_KEY) {
+    // The UI should prevent this from being called if the key is missing,
+    // but this provides an extra layer of protection.
+    throw new Error("Gemini API key not found in environment variables.");
+  }
+  if (!ai) {
+    ai = new GoogleGenAI({ apiKey: process.env.API_KEY });
+  }
+  return ai;
+}
 
 // Helper function to reliably extract JSON from the AI's response,
 // which might be wrapped in markdown code blocks.
