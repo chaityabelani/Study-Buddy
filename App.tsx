@@ -233,14 +233,7 @@ const App: React.FC = () => {
           <ExclamationTriangleIcon className="h-6 w-6 text-red-500 flex-shrink-0 mt-1" />
           <div>
             <h3 className="font-bold text-lg">Application Configuration Error</h3>
-            <p className="mt-1">The Google Gemini API key is missing or invalid. The application cannot function without it.</p>
-            <div className="mt-3 text-sm text-red-700 dark:text-red-200 bg-red-200/50 dark:bg-red-800/30 p-3 rounded-md">
-              <p className="font-semibold">For Developers:</p>
-              <ul className="list-disc list-inside mt-1 space-y-1">
-                <li>Ensure the <code>API_KEY</code> environment variable is correctly set in your development or deployment environment.</li>
-                <li>If you have recently set or changed the API key, <strong>you may need to restart your development server</strong> for the update to take effect.</li>
-              </ul>
-            </div>
+            <p className="mt-1">The Google Gemini API key is missing or invalid. The application cannot function without it. Please contact the administrator to resolve this issue.</p>
           </div>
         </div>
       );
