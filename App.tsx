@@ -10,7 +10,7 @@ import TopicSearch from './components/TopicSearch';
 import VideoOptions from './components/VideoOptions';
 import Presentation from './components/Presentation';
 import ThemeToggle from './components/ThemeToggle';
-import { SparklesIcon, BookOpenIcon, AcademicCapIcon, ArrowUturnLeftIcon } from '@heroicons/react/24/solid';
+import { SparklesIcon, BookOpenIcon, AcademicCapIcon, ArrowUturnLeftIcon, ExclamationTriangleIcon } from '@heroicons/react/24/solid';
 
 type View = 'main' | 'presentation';
 type Theme = 'light' | 'dark';
@@ -21,6 +21,7 @@ const App: React.FC = () => {
   const [sourceContent, setSourceContent] = useState<string | null>(null);
   const [sourceTitle, setSourceTitle] = useState<string>('');
   const [theme, setTheme] = useState<Theme>('dark');
+  const [isApiConfigured, setIsApiConfigured] = useState(true);
 
   const [selectedAction, setSelectedAction] = useState<ActionType | null>(null);
   const [isLoading, setIsLoading] = useState<boolean>(false);
@@ -32,6 +33,11 @@ const App: React.FC = () => {
   const [videoLength, setVideoLength] = useState<string>('any');
 
   useEffect(() => {
+    if (!process.env.API_KEY) {
+      setIsApiConfigured(false);
+      console.error("CRITICAL: API_KEY environment variable is not set. The application will not function.");
+    }
+
     const savedTheme = localStorage.getItem('theme') as Theme | null;
     const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
     const initialTheme = savedTheme || (prefersDark ? 'dark' : 'light');
@@ -149,6 +155,25 @@ const App: React.FC = () => {
   }
 
   const renderContent = () => {
+    if (!isApiConfigured) {
+      return (
+        <div className="bg-red-100/50 dark:bg-red-900/40 backdrop-blur-sm p-8 rounded-2xl border border-red-300 dark:border-red-600 shadow-2xl shadow-red-500/10">
+          <div className="flex items-start sm:items-center">
+            <ExclamationTriangleIcon className="h-10 w-10 text-red-500 dark:text-red-400 mr-4 flex-shrink-0" />
+            <div>
+              <h2 className="text-xl font-bold text-red-800 dark:text-red-200">Application Configuration Error</h2>
+              <p className="text-red-700 dark:text-red-300 mt-1">
+                The Google Gemini API key is missing. The application cannot function without it.
+              </p>
+              <p className="text-sm text-red-600 dark:text-red-400 mt-2">
+                <strong>For Developers:</strong> Please ensure the <code>API_KEY</code> environment variable is set in your deployment environment (e.g., Vercel).
+              </p>
+            </div>
+          </div>
+        </div>
+      );
+    }
+
     if (!appMode) {
       return <Home onModeSelect={setAppMode} />;
     }

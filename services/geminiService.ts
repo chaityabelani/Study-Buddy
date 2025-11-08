@@ -5,7 +5,7 @@ import { VideoSuggestion, QuizQuestion } from '../types';
 const getAi = () => {
   const apiKey = process.env.API_KEY;
   if (!apiKey) {
-    throw new Error("API_KEY is not set in the environment. Please configure it in your deployment settings.");
+    throw new Error("API_KEY is not set. For developers: please configure the API_KEY environment variable in your deployment settings to enable the application.");
   }
   return new GoogleGenAI({ apiKey });
 };
