@@ -222,6 +222,41 @@ const App: React.FC = () => {
     );
   };
 
+  const renderError = () => {
+    if (!error) return null;
+
+    const isApiKeyError = error.includes("Gemini API key not found");
+
+    if (isApiKeyError) {
+      return (
+        <div className="bg-red-100 border border-red-400 text-red-800 dark:bg-red-900/50 dark:border-red-700 dark:text-red-300 px-4 py-3 rounded-lg flex items-start gap-4" role="alert">
+          <ExclamationTriangleIcon className="h-6 w-6 text-red-500 flex-shrink-0 mt-1" />
+          <div>
+            <h3 className="font-bold text-lg">Application Configuration Error</h3>
+            <p className="mt-1">The Google Gemini API key is missing or invalid. The application cannot function without it.</p>
+            <div className="mt-3 text-sm text-red-700 dark:text-red-200 bg-red-200/50 dark:bg-red-800/30 p-3 rounded-md">
+              <p className="font-semibold">For Developers:</p>
+              <ul className="list-disc list-inside mt-1 space-y-1">
+                <li>Ensure the <code>API_KEY</code> environment variable is correctly set in your development or deployment environment.</li>
+                <li>If you have recently set or changed the API key, <strong>you may need to restart your development server</strong> for the update to take effect.</li>
+              </ul>
+            </div>
+          </div>
+        </div>
+      );
+    }
+
+    return (
+       <div className="bg-red-100 border border-red-300 text-red-700 dark:bg-red-900/50 dark:border-red-700 dark:text-red-300 px-4 py-3 rounded-lg flex items-start gap-4" role="alert">
+         <ExclamationTriangleIcon className="h-6 w-6 text-red-500 flex-shrink-0 mt-1" />
+         <div>
+            <p className="font-bold">An Error Occurred</p>
+            <p>{error}</p>
+         </div>
+       </div>
+    );
+  };
+
   if (view === 'presentation' && presentationContent) {
     return <Presentation title={presentationContent.title} content={presentationContent.content} onExit={() => setView('main')} />;
   }
@@ -252,12 +287,7 @@ const App: React.FC = () => {
         <main className="space-y-8">
           {renderContent()}
 
-          {error && (
-            <div className="bg-red-100 border border-red-300 text-red-700 dark:bg-red-900/50 dark:border-red-700 dark:text-red-300 px-4 py-3 rounded-lg" role="alert">
-              <p className="font-bold">Error</p>
-              <p>{error}</p>
-            </div>
-          )}
+          {renderError()}
 
           {(isLoading || result) && selectedAction && (
              <ResultDisplay
